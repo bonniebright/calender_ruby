@@ -9,6 +9,7 @@ describe Event do
   it 'should format the date as MM-DD-YYYY' do
     new_event = Event.create(:start_date_time => '2014-03-25 04:40', :end_date_time => '2014-03-25 04:50')
     new_event.start_formatted_date.should eq '03-25-2014 at 04:40AM'
+    new_event.end_formatted_date.should eq '03-25-2014 at 04:50'
   end
 end
 
