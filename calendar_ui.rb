@@ -74,6 +74,18 @@ def add_event
 end
 
 def list_events_menu
+  puts "To see your current calender, press 'c'"
+  puts "To see your calender history, press 'h'"
+  user_input = gets.chomp
+  case user_input
+  when 'c'
+    current_list_menu
+  when 'h'
+    history_list_menu
+  end
+end
+
+def current_list_menu
   puts "To see your calender for today, press 'd'"
   puts "press 'w' to see the current week"
   puts "'m' to see the current month or"
@@ -91,12 +103,94 @@ def list_events_menu
   end
 end
 
+def history_list_menu
+  puts "To see your calender for yesterday, press 'y'"
+  puts "To see your calender for last week, press 'w'"
+  puts "To see your calender for last month, press 'm'"
+  puts "Press 'l' to see all your past events"
+  puts "Press 'x' to return to list menu"
+  user_input = gets.chomp
+  case user_input
+  when 'y'
+    list_previous_day
+  when 'w'
+    list_last_week
+  when 'm'
+    list_last_month
+  when 'l'
+    list_past_events
+  when 'x'
+    exit
+  end
+end
+
+def list_last_week
+  events = @user.events.where start_date_time: previous_week
+  if events != []
+    events.each do |event|
+      @date = event.start_date_time
+      puts "\n\n#{event.description} at #{event.location} which starts at #{event.start_formatted_date} and ends at #{event.end_formatted_date}.\n\n"
+    end
+  else
+    puts "no entries for #{previous_week}"
+    @date = @date.prev_week
+  end
+  puts "press 'w' to see the events of the previous week:"
+  option = gets.chomp.downcase
+  case option
+  when 'w'
+    list_last_week
+  end
+  list_events_menu
+end
+
+def list_last_month
+  events = @user.events.where start_date_time: previous_month
+  if events != []
+    events.each do |event|
+      @date = event.start_date_time
+       puts "\n\n#{event.description} at #{event.location} which starts at #{event.start_formatted_date} and ends at #{event.end_formatted_date}.\n\n"
+     end
+  else
+    puts "no entries for #{previous_month}"
+    @date = @date.prev_month
+   end
+  puts "press 'm' to see the events of the previous month:"
+  option = gets.chomp.downcase
+  case option
+  when 'm'
+    list_last_month
+  end
+  list_events_menu
+end
+
+def list_previous_day
+  events = @user.events.where start_date_time: previous_day
+  if events != []
+      events.each do |event|
+      @date = event.start_date_time
+      puts "\n\n#{event.description} at #{event.location} which starts at #{event.start_formatted_date} and ends at #{event.end_formatted_date}.\n\n"
+    end
+  else
+    puts "No Events for #{@date}"
+    @date = @date.yesterday
+  end
+  puts "press 'p' to see the events of the previous day"
+  option = gets.chomp.downcase
+  case option
+  when 'p'
+    list_previous_day
+  end
+  list_events_menu
+end
+
 def list_day
   events = @user.events.where start_date_time: current_day
   events.each do |event|
-    puts "\n\n{event.description} at #{event.location} which starts at #{event.start_formatted_date} and ends at #{event.end_formatted_date}.\n\n"
+    @date = event.start_date_time
+    puts "\n\n#{event.description} at #{event.location} which starts at #{event.start_formatted_date} and ends at #{event.end_formatted_date}.\n\n"
   end
-  list_events_menu
+  history_list_menu
 end
 
 def list_week
@@ -120,6 +214,18 @@ def list_events
   events.each do |event|
     puts "\n\n#{event.description} at #{event.location} which starts at #{event.start_formatted_date} and ends at #{event.end_formatted_date}.\n\n"
   end
+end
+
+def previous_day
+  @date.yesterday.beginning_of_day..@date.yesterday.end_of_day
+end
+
+def previous_week
+  @date.prev_week.beginning_of_week..@date.prev_week.end_of_week
+end
+
+def previous_month
+  @date.prev_month.beginning_of_month..@date.prev_month.end_of_month
 end
 
 def current_day
